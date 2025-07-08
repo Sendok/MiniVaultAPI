@@ -1,36 +1,59 @@
-# Import Hugging Face's tokenizer and model for causal language modeling
 from transformers import AutoTokenizer, AutoModelForCausalLM
-# Import PyTorch for tensor manipulation
 import torch
-# Import asyncio for asynchronous token streaming
 import asyncio
 
-# Load the tokenizer and model for the "distilgpt2" model
+# Load the tokenizer and model from Hugging Face (DistilGPT2 in this case)
 tokenizer = AutoTokenizer.from_pretrained("distilgpt2")
 model = AutoModelForCausalLM.from_pretrained("distilgpt2")
 
-# Function to generate a full response (non-streaming)
 def generate_response(prompt: str, max_new_tokens=50) -> str:
-    # Tokenize the prompt into input IDs
-    input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+    """
+    Generate a full text response from a given prompt using a causal language model.
+    
+    Args:
+        prompt (str): The input text prompt.
+        max_new_tokens (int): Maximum number of tokens to generate.
 
-    # Generate output tokens using top-k/top-p sampling
+    Returns:
+        str: The generated response text.
+    """
+    input_ids = tokenizer(prompt, return_tensors="pt").input_ids
     output_ids = model.generate(
         input_ids,
         max_new_tokens=max_new_tokens,
-        do_sample=True,           # Enable sampling instead of greedy decoding
-        top_k=50,                 # Consider top 50 tokens for sampling
-        top_p=0.95,               # Nucleus sampling: cumulative probability threshold
-        temperature=0.9,          # Sampling temperature (creativity)
-        eos_token_id=tokenizer.eos_token_id,  # End generation at EOS token
+        do_sample=True,
+        top_k=50,
+        top_p=0.95,
+        temperature=0.9,
+        eos_token_id=tokenizer.eos_token_id,
     )
-
-    # Decode and return the full response as text
     return tokenizer.decode(output_ids[0], skip_special_tokens=True)
 
-# Asynchronous generator for streaming token-by-token response
 async def generate_response_stream(prompt: str, max_new_tokens=50):
-    # Tokenize the input
-    input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+    """
+    Asynchronously generate a text response from a prompt, yielding tokens one at a time.
+    Useful for streaming output in real time.
+    
+    Args:
+        prompt (str): The input text prompt.
+        max_new_tokens (int): Maximum number of tokens to generate.
 
-    # Generate tokens using the same sampling setting
+    Yields:
+        str: The next decoded token in the generated response.
+    """
+    input_ids = tokenizer(prompt, return_tensors="pt").input_ids
+    output_ids = model.generate(
+        input_ids,
+        max_new_tokens=max_new_tokens,
+        do_sample=True,
+        top_k=50,
+        top_p=0.95,
+        temperature=0.9,
+        eos_token_id=tokenizer.eos_token_id,
+    )
+
+    generated_ids = output_ids[0][input_ids.shape[1]:]  # Only return new tokens
+    for token_id in generated_ids:
+        token = tokenizer.decode(token_id, skip_special_tokens=True)
+        await asyncio.sleep(0.05)  # Optional: simulate delay for streaming effect
+        yield token

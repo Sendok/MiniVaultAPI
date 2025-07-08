@@ -1,42 +1,42 @@
-# Import Typer for building CLI applications
 import typer
-# Import requests for making HTTP requests
 import requests
 
-# Create a Typer app instance
 app = typer.Typer()
 
-# Base URL for the FastAPI backend
 API_URL = "http://localhost:8000"
 
-# CLI command to generate a full response from a prompt
 @app.command()
 def generate(prompt: str):
-    """Generate a response from the prompt."""
+    """
+    Send a prompt to the /generate endpoint and print the full response.
+    
+    Args:
+        prompt (str): The input text to send to the API.
+    """
     try:
-        # Send a POST request to the /generate endpoint with the prompt
         r = requests.post(f"{API_URL}/generate", json={"prompt": prompt})
-        r.raise_for_status()  # Raise error if response is not 200 OK
+        r.raise_for_status()
         response = r.json()["response"]
-        typer.echo(f"\nResponse:\n{response}\n")  # Print the response to terminal
+        typer.echo(f"\nResponse:\n{response}\n")
     except Exception as e:
-        typer.echo(f"[ERROR] {e}")  # Handle any request or parsing errors
+        typer.echo(f"[ERROR] {e}")
 
-# CLI command to stream the response token-by-token
 @app.command()
 def stream(prompt: str):
-    """Stream a response token-by-token."""
+    """
+    Send a prompt to the /generate/stream endpoint and print the streamed response as it arrives.
+    
+    Args:
+        prompt (str): The input text to send to the API for streaming.
+    """
     try:
-        # Send a POST request to the /generate/stream endpoint with streaming enabled
         r = requests.post(f"{API_URL}/generate/stream", json={"prompt": prompt}, stream=True)
-        r.raise_for_status()  # Raise error if response is not successful
+        r.raise_for_status()
         typer.echo("\nStreaming response:\n")
-        # Stream and print each chunk of the response as it arrives
         for chunk in r.iter_content(chunk_size=None):
             typer.echo(chunk.decode("utf-8"), nl=False)
     except Exception as e:
-        typer.echo(f"[ERROR] {e}")  # Print error if something goes wrong
+        typer.echo(f"[ERROR] {e}")
 
-# Entry point when script is executed directly
 if __name__ == "__main__":
     app()
