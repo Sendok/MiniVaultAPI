@@ -22,7 +22,7 @@ A lightweight local REST API that simulates a core feature of ModelVault: receiv
 > ⚠️ Make sure you're using **Python 3.10+** or higher
 
 ```bash
-git clone <your-repo>
+git clone https://github.com/Sendok/MiniVaultAPI
 cd miniVaultAPI
 python3 -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
