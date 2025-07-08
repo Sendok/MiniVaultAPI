@@ -1,0 +1,64 @@
+{
+  "info": {
+    "name": "MiniVault API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "minivault-api-collection"
+  },
+  "item": [
+    {
+      "name": "Generate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Tell me a joke about AI\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/generate",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "generate"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Generate Stream",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prompt\": \"Write a short story\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/generate/stream",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "generate",
+            "stream"
+          ]
+        }
+      }
+    }
+  ]
+}
